@@ -47,12 +47,6 @@ func SaveMatchingEntries(fileName, searchedTerm string) {
 
 	reader := csv.NewReader(sourceFile)
 
-	columns, columnsErr := reader.Read()
-	if columnsErr != nil {
-		fmt.Println("Error reading line:", columnsErr)
-		return
-	}
-
 	outputDir := "./output/" + searchedTerm
 	if outputDrr := os.MkdirAll(outputDir, dirPermission); outputDrr != nil {
 		fmt.Println("!!! error creating output directory:", outputDrr)
@@ -70,31 +64,32 @@ func SaveMatchingEntries(fileName, searchedTerm string) {
 	writer := csv.NewWriter(outputFile)
 	defer writer.Flush()
 
+	columns, columnsErr := reader.Read()
+	if columnsErr != nil {
+		fmt.Println("Error reading line:", columnsErr)
+		return
+	}
+	writer.Write(columns)
+
 	for {
 		record, err := reader.Read()
 		if err == io.EOF {
-			break
+			continue
 		}
 
 		if err != nil {
 			fmt.Println("Error reading line:", err)
-
-			return
+			continue
 		}
 
 		for _, val := range record {
 			if strings.Contains(val, searchedTerm) {
 				if err := writer.Write(record); err != nil {
-					fmt.Println("Error writing header:", err)
-
+					fmt.Println("Error writing line:", err)
 					break
 				}
 			}
 		}
 	}
 
-	if err := writer.Write(columns); err != nil {
-		fmt.Println("Error writing header:", err)
-		return
-	}
 }
