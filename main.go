@@ -18,8 +18,12 @@ func main() {
 	}
 
 	for _, fileName := range inputFileNames {
+		fmt.Println("-------------------------------------------------------------------> Started Analysis")
 		pkg.SaveMatchingEntries(fileName, searchedTerm)
+		fmt.Println("-------------------------------------------------------------------> Finished Analysis")
 	}
 
-	fmt.Println("---> Analyze completed! <---")
+	fmt.Println("---> Analysis completed! <---")
+
+	pkg.ShutdownSystemWithDelay(0)
 }
