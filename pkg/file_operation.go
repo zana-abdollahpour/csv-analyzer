@@ -71,14 +71,16 @@ func SaveMatchingEntries(fileName, searchedTerm string) {
 	}
 	writer.Write(columns)
 
+	var readRecordCount = 1
 	for {
+		fmt.Printf("\r%d", readRecordCount)
 		record, err := reader.Read()
+		readRecordCount++
 		if err == io.EOF {
 			continue
 		}
 
 		if err != nil {
-			fmt.Println("Error reading line:", err)
 			continue
 		}
 
