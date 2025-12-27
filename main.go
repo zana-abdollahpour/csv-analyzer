@@ -10,7 +10,17 @@ import (
 func main() {
 	pkg.Greet()
 
-	searchedTerm := pkg.GetSearchTerm()
+	var searchedTerm string
+	for {
+		searchedTerm = pkg.GetSearchTerm()
+		if searchedTerm == "" {
+			fmt.Println("Please enter a non-empty string!")
+			continue
+		} else {
+			break
+		}
+
+	}
 
 	inputFileNames, inputNamesErr := pkg.GetInputFileNames()
 	if inputNamesErr != nil {
@@ -18,9 +28,9 @@ func main() {
 	}
 
 	for _, fileName := range inputFileNames {
-		fmt.Println("-------------------------------------------------------------------> Started Analysis")
+		fmt.Printf("--> Started Analysis: %s <--", fileName)
 		pkg.SaveMatchingEntries(fileName, searchedTerm)
-		fmt.Println("-------------------------------------------------------------------> Finished Analysis")
+		fmt.Printf("--> Finished Analysis: %s <--", fileName)
 	}
 
 	fmt.Println("---> Analysis completed! <---")

@@ -4,6 +4,7 @@ import (
 	"encoding/csv"
 	"fmt"
 	"io"
+	"log"
 	"os"
 	"strings"
 )
@@ -69,20 +70,27 @@ func SaveMatchingEntries(fileName, searchedTerm string) {
 		fmt.Println("Error reading line:", columnsErr)
 		return
 	}
-	writer.Write(columns)
+
+	columnWriteErr := writer.Write(columns)
+	if columnWriteErr != nil {
+		return
+	}
 
 	var readRecordCount = 1
 	for {
 		fmt.Printf("\r%d", readRecordCount)
 		record, err := reader.Read()
-		readRecordCount++
+
 		if err == io.EOF {
-			continue
+			break
 		}
 
 		if err != nil {
+			log.Printf("Error reading record %d: %v", readRecordCount, err)
 			continue
 		}
+
+		readRecordCount++
 
 		for _, val := range record {
 			if strings.Contains(val, searchedTerm) {
@@ -93,5 +101,7 @@ func SaveMatchingEntries(fileName, searchedTerm string) {
 			}
 		}
 	}
+
+	fmt.Printf("\nTotal records read: %d\n", readRecordCount)
 
 }
