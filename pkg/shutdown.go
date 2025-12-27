@@ -4,9 +4,44 @@ import (
 	"fmt"
 	"os/exec"
 	"runtime"
+
+	"github.com/AlecAivazis/survey/v2"
 )
 
-func ShutdownSystemWithDelay(seconds int) error {
+type AfterFinishFunc func(int) error
+
+func AskAfterFinishBehavior() (AfterFinishFunc, error) {
+	options := []string{
+		"keep the pc running",
+		"shut down",
+	}
+
+	prompt := &survey.Select{
+		Message: "What should the program do after completion?",
+		Options: options,
+	}
+
+	var selected string
+	err := survey.AskOne(prompt, &selected)
+	if err != nil {
+		fmt.Printf("Error: %v\n", err)
+		return nil, err
+	}
+
+	fmt.Println("\nYou selected:")
+	fmt.Printf("✓ %s\n", selected)
+
+	switch selected {
+	case "keep the pc running":
+		return nil, nil
+	case "shut down":
+		return shutDown, nil
+	default:
+		return nil, nil
+	}
+}
+
+func shutDown(seconds int) error {
 	var cmd *exec.Cmd
 
 	switch runtime.GOOS {
